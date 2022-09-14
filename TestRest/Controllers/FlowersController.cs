@@ -16,9 +16,9 @@ namespace TestRest.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [HttpGet]
-        public ActionResult<IEnumerable<Flower>> GetAll()
+        public ActionResult<IEnumerable<Flower>> GetAll([FromQuery] string? speciesFilter, [FromQuery] string? colorFilter)
         {
-            IEnumerable<Flower> flowerList = _manager.GetAll();
+            IEnumerable<Flower> flowerList = _manager.GetAll(speciesFilter, colorFilter);
             if (flowerList.Count() == 0)
             {
                 return NoContent();
@@ -27,7 +27,8 @@ namespace TestRest.Controllers
         }
 
         // GET api/<FlowersController>/5
-        [HttpGet("{id}")]
+        [HttpGet]
+        [Route("{id}")]
         public Flower? Get(int id)
         {
             return _manager.GetById(id);

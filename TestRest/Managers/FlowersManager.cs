@@ -12,9 +12,18 @@ namespace TestRest.Managers
             new Flower(){Id = _nextID++, Species="Daffodill", Height=10, Color= "yellow" }
         };
 
-        public IEnumerable<Flower> GetAll()
+        public IEnumerable<Flower> GetAll(string? speciesFilter, string? colorFilter)
         {
-            return new List<Flower>(_data);
+            List<Flower> result = new List<Flower>(_data);
+            if (speciesFilter != null)
+            {
+                result = result.FindAll(flower => flower.Species.Contains(speciesFilter, StringComparison.InvariantCultureIgnoreCase));
+            }
+            if (colorFilter != null)
+            {
+                result = result.FindAll(flower => flower.Color.Contains(colorFilter, StringComparison.InvariantCultureIgnoreCase));
+            }
+            return result;
         }
 
         public Flower? GetById(int Id)
