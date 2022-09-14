@@ -16,14 +16,14 @@ namespace TestRest.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [HttpGet]
-        public ActionResult<IEnumerable<Flower>> Get()
+        public ActionResult<IEnumerable<Flower>> GetAll()
         {
             IEnumerable<Flower> flowerList = _manager.GetAll();
             if (flowerList.Count() == 0)
             {
                 return NoContent();
             }
-            return Ok();
+            return Ok(flowerList);
         }
 
         // GET api/<FlowersController>/5
