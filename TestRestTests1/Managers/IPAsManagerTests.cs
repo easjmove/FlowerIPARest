@@ -16,7 +16,7 @@ namespace TestRest.Managers.Tests
         public void GetAllTestContains3()
         {
             var manager = new IPAsManager();
-            List<IPA> testList = manager.GetAll();
+            List<IPA> testList = manager.GetAll(null, null);
 
             Assert.AreEqual(testList.Count, 3);
 

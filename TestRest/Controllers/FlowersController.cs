@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using TestRest.Managers;
 using TestRest.Models;
 
@@ -10,15 +11,31 @@ namespace TestRest.Controllers
     [ApiController]
     public class FlowersController : ControllerBase
     {
-        private FlowersManager _manager = new FlowersManager();
+        private readonly FlowersManager _manager = new FlowersManager();
 
         // GET: api/<FlowersController>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [HttpGet]
-        public ActionResult<IEnumerable<Flower>> GetAll([FromQuery] string? speciesFilter, [FromQuery] string? colorFilter)
+        public ActionResult<IEnumerable<Flower>> GetAll(
+            [FromQuery] string? speciesFilter, 
+            [FromQuery] string? colorFilter, 
+            [FromHeader] string? amount)
         {
-            IEnumerable<Flower> flowerList = _manager.GetAll(speciesFilter, colorFilter);
+            if (amount == null) {
+                return BadRequest("Amount must be set");
+            }
+
+            int parsedAmount;
+            if (!int.TryParse(amount, out parsedAmount ))
+            {
+                return BadRequest("Amount must be a number!");
+            }
+            if (parsedAmount <= 0) {
+                return BadRequest("Amount must be a positive number");
+            }
+
+            IEnumerable<Flower> flowerList = _manager.GetAll(speciesFilter, colorFilter, parsedAmount);
             if (flowerList.Count() == 0)
             {
                 return NoContent();
@@ -27,11 +44,17 @@ namespace TestRest.Controllers
         }
 
         // GET api/<FlowersController>/5
-        [HttpGet]
-        [Route("{id}")]
-        public Flower? Get(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [HttpGet("{id}")]
+        public ActionResult<Flower> Get(int id)
         {
-            return _manager.GetById(id);
+            Flower? result = _manager.GetById(id);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
         }
 
         // POST api/<FlowersController>
@@ -53,17 +76,40 @@ namespace TestRest.Controllers
         }
 
         // PUT api/<FlowersController>/5
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpPut("{id}")]
-        public Flower? Put(int id, [FromBody] Flower updates)
+        public ActionResult<Flower> Put(int id, [FromBody] Flower updates)
         {
-            return _manager.Update(id, updates);
+            try
+            {
+                Flower? result = _manager.Update(id, updates);
+                if (result == null)
+                {
+                    return NotFound();
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+          when (ex is ArgumentNullException || ex is ArgumentOutOfRangeException)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // DELETE api/<FlowersController>/5
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpDelete("{id}")]
-        public Flower? Delete(int id)
+        public ActionResult<Flower> Delete(int id)
         {
-            return _manager.Delete(id);
+            Flower? result = _manager.Delete(id);
+            if (result != null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
         }
     }
 }

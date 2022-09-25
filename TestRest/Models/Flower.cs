@@ -7,6 +7,30 @@
         public string? Color { get; set; }
         public int Height { get; set; }
 
+        public void ValidateId()
+        {
+            if (Id < 1)
+            {
+                throw new ArgumentOutOfRangeException("Id must be a positive number!");
+            }
+        }
+
+        public void ValidateSpecies()
+        {
+            if (Species == null)
+            {
+                throw new ArgumentNullException("You need to type Species");
+            }
+            else if (Species.Length > 50)
+            {
+                throw new ArgumentOutOfRangeException("Species name is too long");
+            }
+            else if (Species.Length < 3)
+            {
+                throw new ArgumentOutOfRangeException("Species name is too short");
+            }
+        }
+
         public void ValidateColor()
         {
             if (Color == null)
@@ -23,9 +47,20 @@
             }
         }
 
+        public void ValidateHeight()
+        {
+            if (Height < 1)
+            {
+                throw new ArgumentOutOfRangeException("Height must be a positive number");
+            }
+        }
+
         public void Validate()
         {
+            //ValidateId();
+            ValidateSpecies();
             ValidateColor();
+            ValidateHeight();
         }
     }
 }

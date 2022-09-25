@@ -12,7 +12,7 @@ namespace TestRest.Managers
             new IPA(){Id = _nextID++, Name="Nr44", Proof=6, Brand= "Carlsberg", Grain="Corn" }
         };
 
-        public List<IPA> GetAll(double? minimumProof, double? maximumProof)
+        public IEnumerable<IPA> GetAll(double? minimumProof, double? maximumProof, int? amount)
         {
             List<IPA> list = new List<IPA>(_data);
             if (minimumProof != null)
@@ -23,6 +23,10 @@ namespace TestRest.Managers
             {
                 list = list.FindAll(ipa => ipa.Proof <= maximumProof);
             }
+            if (amount != null)
+            {
+                return list.Take((int)amount);
+            }
             return list;
         }
         public IPA? GetById(int Id)
@@ -32,6 +36,7 @@ namespace TestRest.Managers
 
         public IPA Add(IPA newIpa)
         {
+            newIpa.Validate();
             newIpa.Id = _nextID++;
             _data.Add(newIpa);
             return newIpa;
@@ -39,6 +44,7 @@ namespace TestRest.Managers
 
         public IPA? Update(int Id, IPA updates)
         {
+            updates.Validate();
             IPA? oldIpa = GetById(Id);
             if (oldIpa == null) return null;
             oldIpa.Name = updates.Name;

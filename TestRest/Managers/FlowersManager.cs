@@ -12,17 +12,23 @@ namespace TestRest.Managers
             new Flower(){Id = _nextID++, Species="Daffodill", Height=10, Color= "yellow" }
         };
 
-        public IEnumerable<Flower> GetAll(string? speciesFilter, string? colorFilter)
+        public IEnumerable<Flower> GetAll(string? speciesFilter, string? colorFilter, int? amount)
         {
             List<Flower> result = new List<Flower>(_data);
             if (speciesFilter != null)
             {
-                result = result.FindAll(flower => flower.Species.Contains(speciesFilter, StringComparison.InvariantCultureIgnoreCase));
+                result = result.FindAll(flower => flower.Species != null 
+                && flower.Species.Contains(speciesFilter, StringComparison.InvariantCultureIgnoreCase));
             }
             if (colorFilter != null)
             {
-                result = result.FindAll(flower => flower.Color.Contains(colorFilter, StringComparison.InvariantCultureIgnoreCase));
+                result = result.FindAll(flower => flower.Color != null 
+                && flower.Color.Contains(colorFilter, StringComparison.InvariantCultureIgnoreCase));
             }
+            if(amount != null)
+            {
+                return result.Take((int) amount);
+            }    
             return result;
         }
 
@@ -49,6 +55,7 @@ namespace TestRest.Managers
 
         public Flower? Update(int id, Flower updates)
         {
+            updates.Validate();
             Flower? flower = GetById(id);
             if (flower == null) return null;
             flower.Species = updates.Species;

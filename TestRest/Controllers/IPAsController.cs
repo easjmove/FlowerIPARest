@@ -12,39 +12,107 @@ namespace TestRest.Controllers
     public class IPAsController : ControllerBase
     {
         private IPAsManager _manager = new IPAsManager();
+
         // GET: api/IPAs
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [HttpGet]
-        public IEnumerable<IPA> GetAll([FromQuery] double? minimumProof, [FromQuery] double? maximumProof)
+        public ActionResult<IEnumerable<IPA>> GetAll(
+            [FromQuery] double? minimumProof, 
+            [FromQuery] double? maximumProof, 
+            [FromHeader] string? amount)
         {
-            return _manager.GetAll(minimumProof, maximumProof);
+            if (amount == null)
+            {
+                return BadRequest("Amount must be set");
+            }
+
+            int parsedAmount;
+            if (!int.TryParse(amount, out parsedAmount))
+            {
+                return BadRequest("Amount must be a number!");
+            }
+            if (parsedAmount <= 0)
+            {
+                return BadRequest("Amount must be a positive number");
+            }
+
+            IEnumerable<IPA> result = _manager.GetAll(minimumProof, maximumProof, parsedAmount);
+            if (result.Count() == 0)
+            {
+                return NoContent();
+            }
+            return Ok(result);
         }
 
         // GET api/<IPAsController>/5
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("{id}")]
-        public IPA Get(int id)
+        public ActionResult<IPA> Get(int id)
         {
-            return _manager.GetById(id);
+            IPA? result = _manager.GetById(id);
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
         }
 
         // POST api/<IPAsController>
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost]
-        public IPA Post([FromBody] IPA value)
+        public ActionResult<IPA> Post([FromBody] IPA newIPA)
         {
-            return _manager.Add(value); 
+            try
+            {
+                IPA createdIPA = _manager.Add(newIPA);
+                return Created("api/ipas/" + createdIPA.Id, createdIPA);
+            }
+            catch (Exception ex)
+          when (ex is ArgumentNullException || ex is ArgumentOutOfRangeException)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         // PUT api/<IPAsController>/5
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpPut("{id}")]
-        public IPA Put(int id, [FromBody] IPA value)
+        public ActionResult<IPA> Put(int id, [FromBody] IPA updates)
         {
-            return _manager.Update(id, value);
+            try
+            {
+                IPA? result = _manager.Update(id, updates);
+                if (result == null)
+                {
+                    return NotFound();
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+          when (ex is ArgumentNullException || ex is ArgumentOutOfRangeException)
+            {
+                return BadRequest(ex.Message);
+            }
+                
         }
 
         // DELETE api/<IPAsController>/5
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpDelete("{id}")]
-        public IPA Delete(int id)
+        public ActionResult<IPA> Delete(int id)
         {
-            return _manager.Delete(id);
+            IPA? result = _manager.Delete(id);
+            if (result != null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
         }
     }
 }
