@@ -18,20 +18,22 @@ namespace TestRest.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [HttpGet]
         public ActionResult<IEnumerable<Flower>> GetAll(
-            [FromQuery] string? speciesFilter, 
-            [FromQuery] string? colorFilter, 
+            [FromQuery] string? speciesFilter,
+            [FromQuery] string? colorFilter,
             [FromHeader] string? amount)
         {
-            if (amount == null) {
+            if (amount == null)
+            {
                 return BadRequest("Amount must be set");
             }
 
             int parsedAmount;
-            if (!int.TryParse(amount, out parsedAmount ))
+            if (!int.TryParse(amount, out parsedAmount))
             {
                 return BadRequest("Amount must be a number!");
             }
-            if (parsedAmount <= 0) {
+            if (parsedAmount <= 0)
+            {
                 return BadRequest("Amount must be a positive number");
             }
 

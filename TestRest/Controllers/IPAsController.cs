@@ -18,26 +18,29 @@ namespace TestRest.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [HttpGet]
         public ActionResult<IEnumerable<IPA>> GetAll(
-            [FromQuery] double? minimumProof, 
-            [FromQuery] double? maximumProof, 
+            [FromQuery] double? minimumProof,
+            [FromQuery] double? maximumProof,
             [FromHeader] string? amount)
         {
-            if (amount == null)
-            {
-                return BadRequest("Amount must be set");
-            }
+            //if (amount == null)
+            //{
+            //    return BadRequest("Amount must be set");
+            //}
 
             int parsedAmount;
-            if (!int.TryParse(amount, out parsedAmount))
+            if (amount != null)
             {
-                return BadRequest("Amount must be a number!");
-            }
-            if (parsedAmount <= 0)
-            {
-                return BadRequest("Amount must be a positive number");
+                if (!int.TryParse(amount, out parsedAmount))
+                {
+                    return BadRequest("Amount must be a number!");
+                }
+                if (parsedAmount <= 0)
+                {
+                    return BadRequest("Amount must be a positive number");
+                }
             }
 
-            IEnumerable<IPA> result = _manager.GetAll(minimumProof, maximumProof, parsedAmount);
+            IEnumerable<IPA> result = _manager.GetAll(minimumProof, maximumProof, null);
             if (result.Count() == 0)
             {
                 return NoContent();
@@ -98,7 +101,7 @@ namespace TestRest.Controllers
             {
                 return BadRequest(ex.Message);
             }
-                
+
         }
 
         // DELETE api/<IPAsController>/5
