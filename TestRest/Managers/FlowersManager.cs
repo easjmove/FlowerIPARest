@@ -2,7 +2,7 @@
 
 namespace TestRest.Managers
 {
-    public class FlowersManager
+    public class FlowersManager : IFlowersManager
     {
         private static int _nextID = 1;
         private static readonly List<Flower> _data = new List<Flower>()
@@ -17,18 +17,18 @@ namespace TestRest.Managers
             List<Flower> result = new List<Flower>(_data);
             if (speciesFilter != null)
             {
-                result = result.FindAll(flower => flower.Species != null 
+                result = result.FindAll(flower => flower.Species != null
                 && flower.Species.Contains(speciesFilter, StringComparison.InvariantCultureIgnoreCase));
             }
             if (colorFilter != null)
             {
-                result = result.FindAll(flower => flower.Color != null 
+                result = result.FindAll(flower => flower.Color != null
                 && flower.Color.Contains(colorFilter, StringComparison.InvariantCultureIgnoreCase));
             }
-            if(amount != null)
+            if (amount != null)
             {
-                return result.Take((int) amount);
-            }    
+                return result.Take((int)amount);
+            }
             return result;
         }
 

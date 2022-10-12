@@ -11,7 +11,12 @@ namespace TestRest.Controllers
     [ApiController]
     public class FlowersController : ControllerBase
     {
-        private readonly FlowersManager _manager = new FlowersManager();
+        private readonly IFlowersManager _manager;
+
+        public FlowersController()
+        {
+            _manager = new FlowersManager();
+        }
 
         // GET: api/<FlowersController>
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -22,22 +27,22 @@ namespace TestRest.Controllers
             [FromQuery] string? colorFilter,
             [FromHeader] string? amount)
         {
-            if (amount == null)
-            {
-                return BadRequest("Amount must be set");
-            }
+            //if (amount == null)
+            //{
+            //    return BadRequest("Amount must be set");
+            //}
 
-            int parsedAmount;
-            if (!int.TryParse(amount, out parsedAmount))
-            {
-                return BadRequest("Amount must be a number!");
-            }
-            if (parsedAmount <= 0)
-            {
-                return BadRequest("Amount must be a positive number");
-            }
+            //int parsedAmount;
+            //if (!int.TryParse(amount, out parsedAmount))
+            //{
+            //    return BadRequest("Amount must be a number!");
+            //}
+            //if (parsedAmount <= 0)
+            //{
+            //    return BadRequest("Amount must be a positive number");
+            //}
 
-            IEnumerable<Flower> flowerList = _manager.GetAll(speciesFilter, colorFilter, parsedAmount);
+            IEnumerable<Flower> flowerList = _manager.GetAll(speciesFilter, colorFilter, 50);
             if (flowerList.Count() == 0)
             {
                 return NoContent();

@@ -1,3 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using TestRest;
+using TestRest.Managers;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -20,6 +24,8 @@ builder.Services.AddCors(options =>
                               });
 });
 
+builder.Services.AddDbContext<IpaContext>(opt =>
+opt.UseSqlServer(Secrets.IpaConnectionString));
 
 var app = builder.Build();
 

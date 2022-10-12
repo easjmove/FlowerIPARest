@@ -2,7 +2,7 @@
 
 namespace TestRest.Managers
 {
-    public class IPAsManager
+    public class IPAsManager : IIPAsManager
     {
         private static int _nextID = 1;
         private static List<IPA> _data = new List<IPA>()
@@ -12,7 +12,7 @@ namespace TestRest.Managers
             new IPA(){Id = _nextID++, Name="Nr44", Proof=6, Brand= "Carlsberg", Grain="Corn" }
         };
 
-        public IEnumerable<IPA> GetAll(double? minimumProof, double? maximumProof, int? amount)
+        public IEnumerable<IPA> GetAll(double? minimumProof, double? maximumProof, int amount)
         {
             List<IPA> list = new List<IPA>(_data);
             if (minimumProof != null)

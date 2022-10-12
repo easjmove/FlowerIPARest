@@ -11,7 +11,13 @@ namespace TestRest.Controllers
     [ApiController]
     public class IPAsController : ControllerBase
     {
-        private IPAsManager _manager = new IPAsManager();
+        private IIPAsManager _manager;
+
+        public IPAsController(IpaContext context)
+        {
+
+            _manager = new IPAsManager();
+        }
 
         // GET: api/IPAs
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -22,25 +28,24 @@ namespace TestRest.Controllers
             [FromQuery] double? maximumProof,
             [FromHeader] string? amount)
         {
-            //if (amount == null)
-            //{
-            //    return BadRequest("Amount must be set");
-            //}
-
-            int parsedAmount;
-            if (amount != null)
+            if (amount == null)
             {
-                if (!int.TryParse(amount, out parsedAmount))
-                {
-                    return BadRequest("Amount must be a number!");
-                }
-                if (parsedAmount <= 0)
-                {
-                    return BadRequest("Amount must be a positive number");
-                }
+                return BadRequest("Amount must be set");
             }
 
-            IEnumerable<IPA> result = _manager.GetAll(minimumProof, maximumProof, null);
+            int parsedAmount;
+            
+            if (!int.TryParse(amount, out parsedAmount))
+            {
+                return BadRequest("Amount must be a number!");
+            }
+            if (parsedAmount <= 0)
+            {
+                return BadRequest("Amount must be a positive number");
+            }
+            
+
+            IEnumerable<IPA> result = _manager.GetAll(minimumProof, maximumProof, parsedAmount);
             if (result.Count() == 0)
             {
                 return NoContent();
